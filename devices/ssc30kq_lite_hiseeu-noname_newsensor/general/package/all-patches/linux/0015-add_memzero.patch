@@ -1,0 +1,50 @@
+diff --git a/arch/arm/boot/compressed/string.c b/arch/arm/boot/compressed/string.c
+index 7c01641a59..6f8a006450 100644
+--- a/arch/arm/boot/compressed/string.c
++++ b/arch/arm/boot/compressed/string.c
+@@ -148,3 +148,8 @@ void *memset(void *s, int c, size_t count)
+ 		*xs++ = c;
+ 	return s;
+ }
++
++void __memzero(void *s, size_t count)
++{
++	memset(s, 0, count);
++}
+diff --git a/arch/arm/include/asm/string.h b/arch/arm/include/asm/string.h
+index d6e1abb314..5fbad3ff52 100644
+--- a/arch/arm/include/asm/string.h
++++ b/arch/arm/include/asm/string.h
+@@ -29,6 +29,7 @@ extern void * memchr(const void *, int, __kernel_size_t);
+ #define __HAVE_ARCH_MEMSET
+ extern void * memset(void *, int, __kernel_size_t);
+ extern void *__memset(void *s, int c, __kernel_size_t n);
++extern void __memzero(void *ptr, __kernel_size_t n);
+ 
+ /*
+  * For files that are not instrumented (e.g. mm/slub.c) we
+diff --git a/arch/arm/kernel/armksyms.c b/arch/arm/kernel/armksyms.c
+index da100c70fa..8e8d20cdbc 100644
+--- a/arch/arm/kernel/armksyms.c
++++ b/arch/arm/kernel/armksyms.c
+@@ -90,6 +90,7 @@ EXPORT_SYMBOL(memset);
+ EXPORT_SYMBOL(memcpy);
+ EXPORT_SYMBOL(memmove);
+ EXPORT_SYMBOL(memchr);
++EXPORT_SYMBOL(__memzero);
+ 
+ EXPORT_SYMBOL(mmioset);
+ EXPORT_SYMBOL(mmiocpy);
+diff --git a/arch/arm/lib/Makefile b/arch/arm/lib/Makefile
+index 6889e7e498..05f79b9f47 100644
+--- a/arch/arm/lib/Makefile
++++ b/arch/arm/lib/Makefile
+@@ -7,7 +7,7 @@
+ lib-y		:= backtrace.o changebit.o csumipv6.o csumpartial.o   \
+ 		   csumpartialcopy.o csumpartialcopyuser.o clearbit.o \
+ 		   delay.o delay-loop.o findbit.o memchr.o memcpy.o   \
+-		   memmove.o memset.o setbit.o                        \
++		   memmove.o memset.o setbit.o memzero.o              \
+ 		   strchr.o strrchr.o                                 \
+ 		   testchangebit.o testclearbit.o testsetbit.o        \
+ 		   ashldi3.o ashrdi3.o lshrdi3.o muldi3.o             \
